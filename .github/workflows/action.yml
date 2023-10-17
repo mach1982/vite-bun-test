@@ -6,24 +6,25 @@ on:
       - main
  
 jobs:
-  setup-bun:
+  build:
+    name: Build
     runs-on:  ubuntu-latest
    
     
     steps:
-      - id: checkout
+      
         name: Checkout
         uses: actions/checkout@v3
-      - id: setup-bun
+      
         name: Setup Bun
         uses: oven-sh/setup-bun@v1
         with:
           bun-version: latest
-      - id: verify-bun
+      
         name: Verify Bun
         run: |
           bun --version
-      id: build-bun
+      
       name: Build project
       run: bun run build
 
