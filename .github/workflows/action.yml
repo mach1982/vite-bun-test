@@ -4,46 +4,34 @@ on:
   push:
     branches:
       - main
- 
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
 jobs:
-  build:
-    name: Build
-    runs-on:  ubuntu-latest
-   
-    
+  setup-bun:
+    runs-on: ${{ matrix.os }}
+    continue-on-error: true
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+        bun-version:
+          - latest
+          - canary
+          - "0.5.6"
+          - "9be68ac2350b965037f408ce4d47c3b9d9a76b63"
     steps:
-      
+      - id: checkout
         name: Checkout
         uses: actions/checkout@v3
-      
+      - id: setup-bun
         name: Setup Bun
-        uses: oven-sh/setup-bun@v1
+        uses: ./
         with:
-          bun-version: latest
-      
+          bun-version: ${{ matrix.bun-version }}
+      - id: verify-bun
         name: Verify Bun
         run: |
           bun --version
-      
-      name: Build project
-      run: bun run build
-
-  deploy:
-    name: Deploy
-    needs: build
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-
-    steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: production-files
-          path: ./dist
-
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
-      
