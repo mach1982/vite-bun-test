@@ -4,14 +4,11 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
-  workflow_dispatch:
+ 
 jobs:
   setup-bun:
     runs-on:  ubuntu-latest
-    continue-on-error: true
+   
     
     steps:
       - id: checkout
@@ -26,3 +23,26 @@ jobs:
         name: Verify Bun
         run: |
           bun --version
+      id: build-bun
+      name: Build project
+      run: bun run build
+
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: production-files
+          path: ./dist
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+      
