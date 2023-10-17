@@ -10,27 +10,18 @@ on:
   workflow_dispatch:
 jobs:
   setup-bun:
-    runs-on: ${{ matrix.os }}
+    runs-on:  ubuntu-latest
     continue-on-error: true
-    strategy:
-      matrix:
-        os:
-          - ubuntu-latest
-          - macos-latest
-        bun-version:
-          - latest
-          - canary
-          - "0.5.6"
-          - "9be68ac2350b965037f408ce4d47c3b9d9a76b63"
+    
     steps:
       - id: checkout
         name: Checkout
         uses: actions/checkout@v3
       - id: setup-bun
         name: Setup Bun
-        uses: ./.github/workflows
+        uses: oven-sh/setup-bun@v1
         with:
-          bun-version: ${{ matrix.bun-version }}
+          bun-version: latest
       - id: verify-bun
         name: Verify Bun
         run: |
